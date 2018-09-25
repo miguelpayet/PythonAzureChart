@@ -1,4 +1,5 @@
 import win32com.client
+from diccionario import Diccionario
 
 visCharacterColor  = 1
 visCharacterFont = 0
@@ -26,6 +27,7 @@ class Visio:
         self.page = None
         self.pageHeight = self.visioDoc.PaperHeight(visInches)
         self.pageWidth = self.visioDoc.PaperWidth(visInches) - 2
+        self.stencilDict = Diccionario()
         self.resetY()   
         
     def agregarPagina(self, nombre):
@@ -35,7 +37,7 @@ class Visio:
             self.page = self.visioDoc.Pages.Add()
         self.setLandscape()
         self.page.Name = nombre
-        self.visio.Application.ActiveWindow.Zoom = 1
+        self.visio.Application.ActiveWindow.Zoom = 0.8
         
     def agregarStencil(self, FlowchartStencilName): # Name of Visio stencil containing shapes
         visioStencil = self.visio.Documents.OpenEx(FlowchartStencilName, visOpenDocked);
@@ -52,6 +54,14 @@ class Visio:
         for master in self.visio.ActiveDocument.Masters:
             print(master.Name)
 
+    def obtenerShape(self, nombre):
+        try:
+            shapeName = self.stencilDict.resolver(nombre)
+            item = self.stencil.Masters.ItemU(shapeName)
+        except:
+            item = None
+        return item
+    
     def printShortcuts(self, FlowchartStencilName):
         vsoStencil = self.visio.Documents.add(FlowchartStencilName)
         vsoMasterShortcuts = vsoStencil.MasterShortcuts

@@ -1,7 +1,6 @@
 from funciones import concat, resourceId, SetValor, CalcularNombre, LimpiarNombre
 from collections import defaultdict
 from collections import OrderedDict
-from diccionario import Diccionario
 
 class Dependencia:
 
@@ -36,12 +35,29 @@ class GrupoRecursos:
                     else:
                         print ("error de tipo que no existe ", ' -> ', d)
 
+    def recursosConHijos(self):
+        todos = self.todosLosRecursos()
+        todosConHijos = []
+        for r in todos:
+            if r.totalDependencias() == 0 and r.totalDependientes() > 0: 
+                todosConHijos.append(r)
+        return todosConHijos
+
+    def recursosSinHijos(self):
+        todos = self.todosLosRecursos()
+        todosSinHijos = []
+        for r in todos:
+            if r.totalDependencias() == 0 and r.totalDependientes() == 0: 
+                todosSinHijos.append(r)
+        return todosSinHijos
+    
     def todosLosRecursos(self):
         todos = []
         for recdict in self.recursos.values():
             for rec in recdict.values():
                 todos.append(rec)
         return todos
+
 
 class Recurso:
 
@@ -60,7 +76,6 @@ class Recurso:
         self.setApiVersion(r)
         self.setVmSize(r)   
         self.calcularDependencias(r, parameters)
-        self.stencilDict = Diccionario()
 
     def __eq__(self, other):
         return self.nombre == other.nombre
@@ -92,11 +107,7 @@ class Recurso:
 
     def dibujar(self, visio, nivelHorizontal, nivelVertical, shapePadre = None):
         primero = True
-        try:
-            shapeName = self.stencilDict.resolver(self.tipo)
-            item = visio.stencil.Masters.ItemU(shapeName)
-        except:
-            item = None
+        item = visio.obtenerShape(self.tipo)
         if item == None:
             print("item ", self.tipo, " no existe en stencil")
         else:
@@ -110,7 +121,7 @@ class Recurso:
                 for d in self.dependientes:
                     if not primero:
                         #nivelVertical += 1
-                        visio.y -= (0.9) # nivelVertical *
+                        visio.y -= 0.9
                     else:
                         primero = False
                     d.dibujar(visio, nivelHorizontal, nivelVertical, shape)

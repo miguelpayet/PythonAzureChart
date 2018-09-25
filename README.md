@@ -1,7 +1,15 @@
-# PythonVisioFlowchart 
+# PythonAzureChart
 
-This program uses Python to create a flowchart on a Visio document. Visio 2013 standard, 32 bit Python 2.7 for Windows and the 32 bit version of win32com were used when this program was created.
+This program uses Python to create a diagram of an Azure resource group deployment script on a Visio document. 
 
-Visio must be open before running this program. Open Visio, select NEW then select "Basic Diagram".  You can now run the program and it will create a flowchart.
+Visio 2013 standard, 32 bit Python 3.x for Windows and the 32 bit version of win32com were used when this program was created.
 
-![Visio Flowchart](flowchart.jpg)
+Visio must be open before running this program. Open Visio, select NEW then select "Basic Diagram".  
+
+You obtain the Azure deployment script for a resource group by going into the Azure Portal, selecting a Resource Group, and choosing Automation Script on the options panel. When you download that, you have to extract the template.json file and give that as an argument to the graficador.py script.
+
+The template.json maps the dependency relationships between the resource group components. The program will create a Visio page for each root resource (one which depends on no other resources) and map in in a tree-like fashion with its dependencies. 
+
+Root resources which have no dependencies will appear grouped in the first page.
+
+This is a preliminary version that is riddled with hardcoded variables, testing stuff, and code smells. Over time it should clean up real nice.

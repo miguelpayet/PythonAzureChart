@@ -1,6 +1,4 @@
-#from asciitree import LeftAligned
 from clases import Recurso, GrupoRecursos
-#from collections import OrderedDict
 from pathlib import Path
 import json
 import sys
@@ -8,8 +6,20 @@ from visio import Visio
 
 def GenerarVisio(grupo):
     visio = Visio()
-    for r in grupo.todosLosRecursos():
-        if r.totalDependencias() == 0: #r.nombre == "Ibjbossprd0100ip": #BLNCOTPRD0100": # # and 
+    x = 1
+    visio.resetY()
+    visio.agregarPagina("recursos sin agrupar")
+    for r in grupo.recursosSinHijos():
+        item = visio.obtenerShape(r.tipo)
+        if item is not None:
+            visio.dropShape(item, x, visio.y, r.nombreAbreviado())
+            visio.y -= 0.9
+        else:
+            print ("gráfico no existe para recurso ", r.tipo)            
+        if visio.y < 0:
+            x += 2
+            visio.resetY()
+    for r in grupo.recursosConHijos():
             visio.resetY()
             visio.agregarPagina(r.nombre)
             r.dibujar(visio, 1, 0)
@@ -19,14 +29,14 @@ def main():
 
     if len(sys.argv) == 1:
         print("no especificaste archivo")
-        #return -1
+        return -1
     file_directory = ""
     if len(sys.argv) > 1:
         file_directory = sys.argv[1]
         if file_directory == "":
             print("archivo en blanco?")
-            #return -1
-    file_directory = "D:\\WPy-3702\\graficador\\template.json"
+            return -1
+    #file_directory = "D:\\WPy-3702\\PythonAzureChart\\template.json"
     file_path = Path(file_directory)
     if not file_path.is_file():
         print("archivo no existe")
@@ -47,18 +57,6 @@ def main():
         grupo.agregarRecurso(recurso)
 
     grupo.crearArbol()
-    '''
-    arbol = OrderedDict()
-    todos = sorted(grupo.todosLosRecursos())
-    for r in todos:
-        if r.totalDependencias() == 0:
-            arbol[r.__str__()] = r.obtenerArbol(r)
-    arbolprint = OrderedDict()
-    arbolprint["rg"] = arbol
-    tr = LeftAligned()
-    #print(tr(arbolprint))        
-    '''
-    
     GenerarVisio(grupo)
     
     
