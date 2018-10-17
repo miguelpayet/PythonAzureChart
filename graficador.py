@@ -29,14 +29,14 @@ def main():
 
     if len(sys.argv) == 1:
         print("no especificaste archivo")
-        return -1
+        #return -1
     file_directory = ""
     if len(sys.argv) > 1:
         file_directory = sys.argv[1]
         if file_directory == "":
             print("archivo en blanco?")
             return -1
-    #file_directory = "D:\\WPy-3702\\PythonAzureChart\\template.json"
+    file_directory = "D:\\WPy-3702\\PythonAzureChart\\portales.json"
     file_path = Path(file_directory)
     if not file_path.is_file():
         print("archivo no existe")

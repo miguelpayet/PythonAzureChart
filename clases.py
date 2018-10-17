@@ -1,6 +1,8 @@
-from funciones import concat, resourceId, SetValor, CalcularNombre, LimpiarNombre
+from funciones import concat, resourceId, SetValor
 from collections import defaultdict
 from collections import OrderedDict
+import re
+from pprint import pprint
 
 class Dependencia:
 
@@ -31,9 +33,9 @@ class GrupoRecursos:
                         if d.nombre in self.recursos[d.tipo]:
                             self.recursos[d.tipo][d.nombre].agregarDependiente(v)
                         else:
-                            print ("error de nombre que no existe ", ' -> ', d)
+                            print ("error de nombre que no existe ") #, ' -> ', d)
                     else:
-                        print ("error de tipo que no existe ", ' -> ', d)
+                        print ("error de tipo que no existe ") #, ' -> ', d)
 
     def recursosConHijos(self):
         todos = self.todosLosRecursos()
@@ -62,6 +64,7 @@ class GrupoRecursos:
 class Recurso:
 
     def __init__(self, r, parameters):
+        self.anonimos = 0
         self.nivel = 0
         self.apiVersion = ""
         self.dependencias = []
@@ -101,10 +104,31 @@ class Recurso:
     def calcularDependencias(self, r, parameters):
         if "dependsOn" in r:
             for d in r["dependsOn"]:
-                deps = eval(LimpiarNombre(d))
+                deps = eval(self.limpiarNombre(d))
                 for d in deps[1]:
                     self.dependencias.append(Dependencia(deps[0], d))
 
+    def calcularNombre(self, n, parameters):
+        nombre = self.limpiarNombre(n)
+        try:
+            valor = eval(nombre)
+            tipo = type(valor).__name__
+            cadena = ""
+            if tipo == "dict":
+                if "defaultValue" in valor:
+                    cadena = valor["defaultValue"]
+                    if cadena is None:
+                        raise ValueError("no tiene nombre")
+            elif tipo == "str":
+                cadena = valor
+        except: # Exception as error:
+            m = re.search("^[^_]+_([^_]+)_[^_]+$", nombre)
+            if m: 
+                cadena = m.group(1)
+            else:
+                cadena = "sin nombre " + str(++self.anonimos)            
+        return cadena
+    
     def dibujar(self, visio, nivelHorizontal, nivelVertical, shapePadre = None):
         primero = True
         item = visio.obtenerShape(self.tipo)
@@ -126,6 +150,18 @@ class Recurso:
                         primero = False
                     d.dibujar(visio, nivelHorizontal, nivelVertical, shape)
         return 0
+
+    def limpiarNombre(self, nombre):
+        nombre = nombre[1:len(nombre) - 1]
+        nombre = nombre.replace("(", "[")
+        nombre = nombre.replace(")", "]")
+        nombre = nombre.replace("'", "\'")
+        cadenas = ["concat", "resourceId"]
+        for c in cadenas:
+            l = len(c)
+            if nombre[0:l] == c:
+                return nombre[0:l] + "(" + nombre[l + 1:len(nombre) - 1] + ")"
+        return nombre
         
     def nombreAbreviado(self):
         lista = self.tipo.rpartition("/")
@@ -150,7 +186,7 @@ class Recurso:
       self.apiVersion = SetValor(r, "apiVersion")
 
     def setNombre(self, r, parameters):
-        self.nombre = CalcularNombre(r["name"], parameters)
+        self.nombre = self.calcularNombre(r["name"], parameters)
         lista = self.nombre.rpartition("/")
         self.id = lista[2]
 
