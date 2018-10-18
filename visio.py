@@ -59,7 +59,7 @@ class Visio:
             shapeName = self.stencilDict.resolver(nombre)
             item = self.stencil.Masters.ItemU(shapeName)
         except:
-            print("no existe stencil para ", shapeName)
+            print("no existe stencil para ", nombre)
             item = None
         return item
     

@@ -4,6 +4,7 @@ import json
 import sys
 from visio import Visio
 
+
 def GenerarVisio(grupo):
     visio = Visio()
     x = 1
@@ -12,7 +13,7 @@ def GenerarVisio(grupo):
     for r in grupo.recursosSinHijos():
         item = visio.obtenerShape(r.tipo)
         if item is not None:
-            visio.dropShape(item, x, visio.y, r.nombreAbreviado())
+            visio.dropShape(item, x, visio.y, r.displayName)
             visio.y -= 0.9
         else:
             print ("gráfico no existe para recurso ", r.tipo)            
@@ -23,7 +24,7 @@ def GenerarVisio(grupo):
             visio.resetY()
             visio.agregarPagina(r.nombre)
             r.dibujar(visio, 1, 0)
-    print("fin")
+            
     
 def main():
 
@@ -36,7 +37,7 @@ def main():
         if file_directory == "":
             print("archivo en blanco?")
             return -1
-    file_directory = "D:\\WPy-3702\\PythonAzureChart\\portales.json"
+    #file_directory = "D:\\WPy-3702\\PythonAzureChart\\portales.json"
     file_path = Path(file_directory)
     if not file_path.is_file():
         print("archivo no existe")
@@ -58,6 +59,7 @@ def main():
 
     grupo.crearArbol()
     GenerarVisio(grupo)
+    print("bye")
     
     
 if __name__ == '__main__':
