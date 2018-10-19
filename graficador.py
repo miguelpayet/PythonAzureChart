@@ -1,9 +1,9 @@
-from clases import Recurso, GrupoRecursos
+﻿from clases import Recurso, GrupoRecursos
 from pathlib import Path
 import json
 import sys
 from visio import Visio
-
+from exclusiones import exclusiones
 
 def GenerarVisio(grupo):
     visio = Visio()
@@ -53,10 +53,10 @@ def main():
     grupo = GrupoRecursos()
     for r in data["resources"]:
         totalRecursos += 1
-        recurso = None
-        recurso = Recurso(r, parameters)
-        grupo.agregarRecurso(recurso)
-
+        if r["type"] not in exclusiones:
+            recurso = None
+            recurso = Recurso(r, parameters)
+            grupo.agregarRecurso(recurso)
     grupo.crearArbol()
     GenerarVisio(grupo)
     print("bye")

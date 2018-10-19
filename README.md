@@ -14,4 +14,11 @@ The template.json maps the dependency relationships between the resource group c
 
 Root resources which have no dependencies will appear grouped in the first page.
 
-This is a preliminary version that is riddled with hardcoded variables, testing stuff, and code smells. Over time it should clean up real nice.
+To run do
+
+```
+python graficador.py <template.json>
+```
+
+This was a proof-of-concept that creates a diagram without adding any rules or structure. To create a really useful diagram would require adding significant amounts of logic.
+
