@@ -1,8 +1,6 @@
 from funciones import SetValor
-from collections import defaultdict
-from collections import OrderedDict
 from resolvedor import Resolvedor
-        
+
 
 class Dependencia:
 
@@ -15,50 +13,6 @@ class Dependencia:
 
     def __str__(self):
         return self.nombre + " (" + self.tipo + ")"
-
-
-class GrupoRecursos:
-
-    def __init__(self):
-        self.recursos = defaultdict(dict)
-
-    def agregarRecurso(self, recurso):
-        self.recursos[recurso.tipo][recurso.id] = recurso
-
-    def crearArbol(self):
-        for tipo,recursos in self.recursos.items():
-            for k,v in recursos.items():
-                for d in v.dependencias:
-                    if d.tipo in self.recursos:
-                        if d.nombre in self.recursos[d.tipo]:
-                            self.recursos[d.tipo][d.nombre].agregarDependiente(v)
-                        else:
-                            print ("error de nombre que no existe ", ' -> ', d)
-                    else:
-                        print ("error de tipo que no existe ", ' -> ', d)
-
-    def recursosConHijos(self):
-        todos = self.todosLosRecursos()
-        todosConHijos = []
-        for r in todos:
-            if r.totalDependencias() == 0 and r.totalDependientes() > 0: 
-                todosConHijos.append(r)
-        return todosConHijos
-
-    def recursosSinHijos(self):
-        todos = self.todosLosRecursos()
-        todosSinHijos = []
-        for r in todos:
-            if r.totalDependencias() == 0 and r.totalDependientes() == 0: 
-                todosSinHijos.append(r)
-        return todosSinHijos
-    
-    def todosLosRecursos(self):
-        todos = []
-        for recdict in self.recursos.values():
-            for rec in recdict.values():
-                todos.append(rec)
-        return todos
 
 
 class Recurso:
@@ -145,20 +99,6 @@ class Recurso:
         lista = self.tipo.rpartition("/")
         nombre = self.nombre + " (" + lista[2] + ")"
         return nombre
-    
-    def obtenerArbol(self, parent):
-        self.nivel += 1
-        lista = OrderedDict()
-        if self.totalDependientes == 0:
-            lista[self.__str__()] = {}
-            return lista
-        for d in self.dependientes:
-            if d == parent:
-                lista["referencia circular a " + parent.__str__()] = {}
-            else:
-                lista[d.__str__()] = d.obtenerArbol(self)            
-        self.nivel -= 1
-        return lista
 
     def setApiVersion(self, r):
         self.apiVersion = SetValor(r, "apiVersion")
