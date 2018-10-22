@@ -1,81 +1,42 @@
-from visio import Visio        
-from collections import  defaultdict, OrderedDict
-
-class Dependencia:
-
-    def __init__(self, t, n):
-        self.tipo = t
-        self.nombre = n
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        return self.nombre + " (" + self.tipo + ")"
+from clases import Dependencia
+from collections import defaultdict, OrderedDict
+from funciones import ordenador
+from recurso import Recurso
+from resolvedor import resolvedor
 
 
 class GrupoRecursos:
 
     def __init__(self):
         self.recursos = defaultdict(dict)
+        self.dependencias = []
 
-    def agregarRecurso(self, recurso):
+    def agregarDependencias(self, recurso, rjson):
+        if "dependsOn" in rjson:
+            for d in rjson["dependsOn"]:  # dependsOn contiene puro resourceId
+                deps = resolvedor.resolver(d)
+                for d in deps[1]:  # deps[0] es el tipo de los recursos
+                    self.dependencias.append(Dependencia(recurso, deps[0], d))
+
+    def agregarRecurso(self, rjson):
+        recurso = Recurso(rjson)
         self.recursos[recurso.tipo][recurso.id] = recurso
+        self.agregarDependencias(recurso, rjson)
 
-    def crearArbol(self):
-        print ("--------------")
-        llaves = list(self.recursos.keys()).sort()
-        print(llaves)
-        for tipo, recursos in self.recursos.items():
-            print(tipo)
-            for k,v in recursos.items():
-                print('-> ', k)
-                for d in v.dependencias:
-                    if d.tipo in self.recursos:
-                        if d.nombre in self.recursos[d.tipo]:
-                            self.recursos[d.tipo][d.nombre].agregarDependiente(v)
-                        else:
-                            pass #print ("error de nombre que no existe ", ' -> ', d)
-                    else:
-                        pass #print ("error de tipo que no existe ", ' -> ', d)
-        print ("--------------")
+    def generarMapa(self):
+        print("generar mapa")
 
-    def generarVisio(self):
-        visio = Visio()
-        x = 1
-        visio.resetY()
-        visio.agregarPagina("recursos sin agrupar")
-        for r in self.recursosSinHijos():
-            item = visio.obtenerShape(r.tipo)
-            if item is not None:
-                visio.dropShape(item, x, visio.y, r.displayName)
-                visio.y -= 0.9
+    def resolverDependencias(self):
+        for dep in self.dependencias:
+            if dep.tipoDependencia in self.recursos:
+                res = self.recursos[dep.tipoDependencia]
+                if dep.nombreDependencia in res:
+                    dep.dependencia = res[dep.nombreDependencia]
+                else:
+                    print("no existe objeto " + dep.nombreDependencia)
             else:
-                print ("gráfico no existe para recurso ", r.tipo)            
-            if visio.y < 0:
-                x += 2
-                visio.resetY()
-        for r in self.recursosConHijos():
-                visio.resetY()
-                visio.agregarPagina(r.nombre)
-                r.dibujar(visio, 1, 0)
-                
-    def recursosConHijos(self):
-        todos = self.todosLosRecursos()
-        todosConHijos = []
-        for r in todos:
-            if r.totalDependencias() == 0 and r.totalDependientes() > 0: 
-                todosConHijos.append(r)
-        return todosConHijos
-    
-    def recursosSinHijos(self):
-        todos = self.todosLosRecursos()
-        todosSinHijos = []
-        for r in todos:
-            if r.totalDependencias() == 0 and r.totalDependientes() == 0: 
-                todosSinHijos.append(r)
-        return todosSinHijos
-    
+                print("no existe tipo " + dep.tipoDependencia)
+
     def todosLosRecursos(self):
         todos = []
         for recdict in self.recursos.values():

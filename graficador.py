@@ -1,11 +1,11 @@
-﻿from clases import Recurso
+﻿from exclusiones import exclusiones
+from funciones import GetValor
 from gruporecursos import GrupoRecursos
 from pathlib import Path
+from resolvedor import resolvedor
 import json
 import sys
-from exclusiones import exclusiones
 
-    
 def main():
 
     if len(sys.argv) == 1:
@@ -17,27 +17,25 @@ def main():
         if file_directory == "":
             print("archivo en blanco?")
             return -1
-    file_directory = "D:\\WPy-3702\\PythonAzureChart\\template.json"
+    file_directory = "./template.json"
     file_path = Path(file_directory)
     if not file_path.is_file():
         print("archivo no existe")
         return -1
 
-    totalRecursos = 0
-
-    json_data = open(file_directory).read()
+    json_data = open(file_directory, encoding='latin-1').read()
     data = json.loads(json_data)
     parameters = data["parameters"]
 
+    resolvedor.setParametros(parameters)
     grupo = GrupoRecursos()
     for r in data["resources"]:
-        totalRecursos += 1
-        if r["type"] not in exclusiones:
-            recurso = None
-            recurso = Recurso(r, parameters)
-            grupo.agregarRecurso(recurso)
-    grupo.crearArbol()
-    grupo.generarVisio()
+        if GetValor(r, "type") not in exclusiones:
+            grupo.agregarRecurso(r)
+    grupo.resolverDependencias()
+    #grupo.crearArbol()
+    ##grupo.generarVisio()
+    #grupo.generarArbol()
     print("bye")
     
     

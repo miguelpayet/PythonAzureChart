@@ -1,6 +1,7 @@
 import ast
 import re 
 
+
 class Visitador(ast.NodeVisitor):
     
     def __init__(self, parametros):
@@ -36,25 +37,20 @@ class Visitador(ast.NodeVisitor):
    
         
 class Resolvedor:
-    
-    def __init__(self, parametros):
-        self.parametros = parametros
-        self.visitador = Visitador(parametros)
-
+              
+    def limpiarNombre(self, nombre):
+        nombre = nombre[1:len(nombre) - 1]
+        return nombre
+  
     def resolver(self, formula):
+        formula = self.limpiarNombre(formula)
         tree = ast.parse(formula, filename='<unknown>', mode='eval')
         self.visitador.generic_visit(tree)
         return self.visitador.result
-    
-    
+
+    def setParametros(self, parametros):
+        self.parametros = parametros
+        self.visitador = Visitador(parametros)
+
         
-        
-#print("hola")
-#json_data = open("D:\WPy-3702\PythonAzureChart\portales.json").read()
-#data = json.loads(json_data)
-#parameters = data["parameters"]
-#test = "Echo API"
-#r = Resolvedor(parameters)
-#res = r.resolver(test)
-#print (res)
-#print("bye")
+resolvedor = Resolvedor()

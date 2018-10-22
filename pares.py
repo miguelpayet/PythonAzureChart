@@ -1,4 +1,9 @@
-pares = [
-        ("'Microsoft.Compute/availabilitySets'", "Microsoft.Compute/virtualMachines", 1),
-        
-        ]
+orden = dict()
+orden["Microsoft.Network/virtualNetworks"] = 1
+orden["Microsoft.Network/virtualNetworks/subnets"] = 2
+orden["Microsoft.Network/networkSecurityGroups"] = 3
+orden["Microsoft.Compute/virtualMachines"] = 4
+orden["Microsoft.Network/publicIPAddresses"] = 5
+orden["Microsoft.Network/networkInterfaces"] = 6
+orden["Microsoft.Storage/storageAccounts"] = 7
+orden["Microsoft.Compute/availabilitySets"] = 99
