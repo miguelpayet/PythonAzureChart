@@ -1,17 +1,13 @@
 class Dependencia:
 
-    def __init__(self, recurso, tipoDep, nombreDep):
+    def __init__(self, recurso, tipodep, nombredep):
         self.recurso = recurso
         self.dependencia = None
-        self.tipoDependencia = tipoDep
-        self.nombreDependencia = nombreDep
+        self.tipoDependencia = tipodep
+        self.nombreDependencia = nombredep
 
-
-class Nodo:
-
-    def __init__(self):
-        self.recurso = None
-        self.dependsOn = []
+    def __str__(self):
+        return self.recurso.__str__()
 
 
 class SKU:

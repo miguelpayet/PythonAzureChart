@@ -1,5 +1,4 @@
-˘from clases import SKU
-from collections import OrderedDict
+from clases import SKU
 from funciones import GetValor
 from resolvedor import resolvedor
 
@@ -15,11 +14,11 @@ class Recurso:
         self.sku = ""
         self.tipo = ""
         self.vmSize = ""
-        self.setNombre(r)
-        self.setTipo(r)
-        self.setApiVersion(r)
-        self.setVmSize(r)
-        self.setDisplayName(r)
+        self.setnombre(r)
+        self.settipo(r)
+        self.setapiversion(r)
+        self.setvmsize(r)
+        self.setdisplayname(r)
 
     def __eq__(self, other):
         return self.__str__() == other.__str__()
@@ -36,31 +35,32 @@ class Recurso:
     def __str__(self):
         return self.nombre + " (" + self.tipo + ")"
 
-    def calcularNombre(self, n):
+    @staticmethod
+    def calcularnombre(n):
         cadena = resolvedor.resolver(n)
         return cadena
 
-    def nombreAbreviado(self):
+    def nombreabreviado(self):
         lista = self.tipo.rpartition("/")
         nombre = self.nombre + " (" + lista[2] + ")"
         return nombre
 
-    def setApiVersion(self, r):
+    def setapiversion(self, r):
         self.apiVersion = GetValor(r, "apiVersion")
 
-    def setDisplayName(self, r):
+    def setdisplayname(self, r):
         valor = self.__str__()
         if "properties" in r:
             if "displayName" in r["properties"]:
                 valor = r["properties"]["displayName"]
         return valor
 
-    def setNombre(self, r):
-        self.nombre = self.calcularNombre(r["name"])
+    def setnombre(self, r):
+        self.nombre = self.calcularnombre(r["name"])
         lista = self.nombre.rpartition("/")
         self.id = lista[2]
 
-    def setSKU(self, r):
+    def setsku(self, r):
         if "sku" in r:
             sku = r["sku"]
             self.sku = SKU()
@@ -70,10 +70,10 @@ class Recurso:
         else:
             self.sku = None
 
-    def setTipo(self, r):
+    def settipo(self, r):
         self.tipo = GetValor(r, "type")
 
-    def setVmSize(self, r):
+    def setvmsize(self, r):
         self.vmSize = ""
         if "properties" in r:
             if "hardwareProfile" in r["properties"]:

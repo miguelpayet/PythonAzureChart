@@ -5,13 +5,13 @@ from pathlib import Path
 from resolvedor import resolvedor
 import json
 import sys
+from arbol import Arbol
+
 
 def main():
-
     if len(sys.argv) == 1:
         print("no especificaste archivo")
-        #return -1
-    file_directory = ""
+        return -1
     if len(sys.argv) > 1:
         file_directory = sys.argv[1]
         if file_directory == "":
@@ -31,13 +31,14 @@ def main():
     grupo = GrupoRecursos()
     for r in data["resources"]:
         if GetValor(r, "type") not in exclusiones:
-            grupo.agregarRecurso(r)
-    grupo.resolverDependencias()
-    #grupo.crearArbol()
-    ##grupo.generarVisio()
-    #grupo.generarArbol()
+            grupo.agregarrecurso(r)
+    grupo.resolverdependencias()
+    # grupo.crearArbol()
+    # grupo.generarVisio()
+    arbol = Arbol(grupo)
+    arbol.imprimir()
     print("bye")
-    
-    
+
+
 if __name__ == '__main__':
     main()
