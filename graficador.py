@@ -45,7 +45,7 @@ def main():
 
     totalRecursos = 0
 
-    json_data = open(file_directory).read()
+    json_data = open(file_directory, encoding='latin-1').read()
 
     data = json.loads(json_data)
     parameters = data["parameters"]
