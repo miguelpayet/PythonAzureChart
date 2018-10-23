@@ -1,0 +1,120 @@
+      self.dependencias = []
+        self.dependientes = []
+  
+  
+    def agregarAlArbol(self, arbol):
+        # ver la forma de que si un objeto ya está en el arbol general no volverlo a agregar
+        od = OrderedDict()
+        if self.totalDependientes() == 0:
+            od[self.__str__()] = {}
+            arbol[self.__str__()] = od
+        else:
+            for d in self.dependientes:
+                d.agregarAlArbol(od)
+                arbol[self.__str__()] = od
+
+
+    def agregarDependiente(self, dependiente):
+        if (self.tipo == "Microsoft.Compute/availabilitySets") and (dependiente.tipo == "Microsoft.Compute/virtualMachines"):
+            pass
+        else:
+            self.dependientes.append(dependiente)
+
+    def totalDependencias(self):
+        return len(self.dependencias)
+
+    def totalDependientes(self):
+        return len(self.dependientes)
+
+    def dibujar(self, visio, nivelHorizontal, nivelVertical, shapePadre=None):
+        primero = True
+        item = visio.obtenerShape(self.tipo)
+        if item == None:
+            print("item ", self.tipo, " no existe en stencil")
+        else:
+            x = nivelHorizontal
+            shape = visio.dropShape(item, x, visio.y, self.displayName)
+            nivelHorizontal += 1
+            x = 1.2 * nivelHorizontal
+            if shapePadre is not None:
+                shapePadre.autoConnect(shape, 0)
+            if self.totalDependientes() > 0:
+                for d in self.dependientes:
+                    if not primero:
+                        visio.y -= 0.9
+                    else:
+                        primero = False
+                    d.dibujar(visio, nivelHorizontal, nivelVertical, shape)
+        return 0
+        
+        
+        
+    def generarVisio(self):
+        from visio import Visio
+        visio = Visio()
+        x = 1
+        visio.resetY()
+        visio.agregarPagina("recursos sin agrupar")
+        for r in self.recursosSinHijos():
+            item = visio.obtenerShape(r.tipo)
+            if item is not None:
+                visio.dropShape(item, x, visio.y, r.displayName)
+                visio.y -= 0.9
+            else:
+                print("gráfico no existe para recurso ", r.tipo)
+            if visio.y < 0:
+                x += 2
+                visio.resetY()
+        for r in self.recursosConHijos():
+            visio.resetY()
+            visio.agregarPagina(r.nombre)
+            r.dibujar(visio, 1, 0)
+
+
+           def recursosConHijos(self):
+        todos = self.todosLosRecursos()
+        todosConHijos = []
+        for r in todos:
+            if r.totalDependencias() == 0 and r.totalDependientes() > 0:
+                todosConHijos.append(r)
+        return todosConHijos
+
+    def recursosSinHijos(self):
+        todos = self.todosLosRecursos()
+        todosSinHijos = []
+        for r in todos:
+            if r.totalDependencias() == 0 and r.totalDependientes() == 0:
+                todosSinHijos.append(r)
+        return todosSinHijos
+        
+        
+          def crearArbol(self):
+        llaves = list(self.recursos.keys())
+        llaves.sort(key=ordenador)
+        for tipo in llaves:
+            recursos = self.recursos[tipo]
+            for k, v in recursos.items():
+                for d in v.dependencias:
+                    if d.tipo in self.recursos:
+                        if d.nombre in self.recursos[d.tipo]:
+                            self.recursos[d.tipo][d.nombre].agregarDependiente(v)
+                        else:
+                            # print ("error de nombre que no existe ", ' -> ', d)
+                            pass
+                    else:
+                        # print ("error de tipo que no existe ", ' -> ', d)
+                        pass
+
+    def generarArbol(self):
+        arbol = OrderedDict()
+        todos = sorted(self.todosLosRecursos())
+        for r in todos:
+            r.agregarAlArbol(arbol)
+        from asciitree import LeftAligned
+        tr = LeftAligned()
+        arbolprint = OrderedDict()
+        arbolprint["rg"] = arbol
+        print(tr(arbolprint))
+        
+        carta-factura-canción-marco
+
