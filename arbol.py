@@ -19,14 +19,15 @@ class Nodo:
     def addhijo(self, rec):
         self.hijos.append(rec)
 
-    def creardict(self):
+    def creardict(self, arbol):
         lista = OrderedDict()
         if len(self.hijos) == 0:
             lista[self.__str__()] = {}
+            arbol[self.__str__()] = lista
         else:
             for hijo in self.hijos:
-                lista[self.__str__()] = hijo.creardict()
-        return lista
+                hijo.creardict(lista)
+                arbol[self.__str__()] = lista
 
 
 class Arbol:
@@ -48,7 +49,7 @@ class Arbol:
         for dep in self.gruporecursos.dependencias:
             # ignorar las relaciones donde el availability set depende de la vm
             if dep.dependencia is not None and dep.dependencia.tipo == "Microsoft.Compute/availabilitySets":
-                if dep.recurso.tipo == :
+                if dep.recurso.tipo == "Microsoft.Compute/virtualMachines":
                     continue
             # encontrar el nodo donde la dependencia es el padre
             nodopadre = self.encontrarnodo(dep.dependencia)
@@ -76,6 +77,7 @@ class Arbol:
         return foundnode
 
     def imprimir(self):
-        dictarbol = self.mainnode.creardict()
+        dictarbol = OrderedDict()
+        self.mainnode.creardict(dictarbol)
         tr = LeftAligned()
         print(tr(dictarbol))
